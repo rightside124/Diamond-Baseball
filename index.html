@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Diamond Legends Pro - Mobile Season</title>
+    <title>Diamond Legends Pro v1.1 - Career Mode</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body { background-color: #020617; overflow: hidden; color: white; font-family: 'Inter', sans-serif; }
@@ -63,6 +63,33 @@
             #mobile-controls { display:flex; position:absolute; left:8px; right:8px; bottom:8px; justify-content:center; gap:8px; pointer-events:auto; }
         }
 
+    
+        /* v1.1 mobile overlap fixes + career additions */
+        #opt-out-btn { white-space: nowrap; }
+        .career-panel { background: rgba(15,23,42,.96); border:1px solid rgba(251,191,36,.18); border-radius:18px; padding:14px; }
+        .upgrade-row { display:flex; align-items:center; justify-content:space-between; gap:10px; margin:8px 0; }
+        .upgrade-row button { min-width:38px; }
+        @media (max-width: 760px) {
+            #game-hud { position:relative; z-index:5; }
+            #game-hud > .stat-box:first-child { transform: scale(.68); max-width: 265px; }
+            #player-card { top: 72px !important; right: 6px !important; min-width: 204px !important; max-width: 204px !important; z-index: 6; }
+            #batter-name-mini { font-size: 10px !important; }
+            #pitching-ui { bottom: 8px !important; left:8px !important; right:8px !important; max-height: 34dvh; overflow-y:auto; padding-bottom: 2px; z-index: 8; }
+            #pitch-buttons-container { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+            #pitch-buttons-container button { min-height: 38px; }
+            #mobile-controls { top: 42px !important; bottom: auto !important; left: 50% !important; right: auto !important; transform: translateX(-50%); width: max-content; max-width: calc(100vw - 20px); pointer-events:none; z-index:4; opacity:.75; }
+            .mobile-pill { padding: 6px 10px; font-size: 8px; }
+            #pitch-feedback { position:absolute; top: 178px; left:0; right:0; margin-top:0 !important; text-align:center; pointer-events:none; }
+            #batting-ui { z-index: 9; }
+            #sim-ui { max-height: calc(100dvh - 24px); overflow-y:auto; }
+        }
+        @media (max-width: 420px) {
+            #player-card { top: 86px !important; min-width: 190px !important; max-width: 190px !important; }
+            #player-card .stat-val { font-size:8px; }
+            #pitch-buttons-container { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+            #pitching-ui { max-height: 38dvh; }
+        }
+
     </style>
 </head>
 <body class="flex items-center justify-center h-screen">
@@ -93,7 +120,7 @@
                 <div id="player-card" class="interactive stat-box min-w-[430px] max-w-[430px]">
                     <div class="flex justify-between items-center mb-2">
                         <div>
-                            <div class="flex items-center gap-2"><div id="card-title" class="text-[8px] font-black text-blue-400 uppercase tracking-widest">PLAYER STATS</div><button id="stats-toggle" onclick="toggleStatsView()" class="btn tiny-btn bg-slate-800 border border-slate-700 text-amber-400">GAME</button><button id="extra-toggle" onclick="toggleExtraStats()" class="btn tiny-btn bg-slate-800 border border-slate-700 text-blue-300">DETAILS</button></div>
+                            <div class="flex items-center gap-2"><div id="card-title" class="text-[8px] font-black text-blue-400 uppercase tracking-widest">PLAYER STATS</div><button id="stats-toggle" onclick="toggleStatsView()" class="btn tiny-btn bg-slate-800 border border-slate-700 text-amber-400">GAME</button><button id="extra-toggle" onclick="toggleExtraStats()" class="btn tiny-btn bg-slate-800 border border-slate-700 text-blue-300">DETAILS</button><button id="opt-out-btn" onclick="optOutGame()" class="btn tiny-btn bg-red-900/70 border border-red-700 text-red-200 hidden">OPT OUT</button></div>
                             <div id="card-name" class="font-black text-white uppercase tracking-tight text-lg">PLAYER</div>
                             <div id="season-line" class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Season 1/4</div>
                         </div>
@@ -179,7 +206,7 @@
             <div id="start-screen" class="interactive start-glow bg-slate-900 p-12 rounded-3xl border-t-8 border-amber-500 shadow-2xl text-center w-[450px] mx-auto absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <div class="start-diamond"></div>
                 <h1 class="text-5xl font-black italic text-white mb-2 tracking-tighter">DIAMOND<span class="text-amber-500">LEGENDS</span></h1>
-                <p class="text-slate-500 text-[10px] mb-10 uppercase tracking-[0.4em] font-bold">4-Game Season • Mobile Ready</p>
+                <p class="text-slate-500 text-[10px] mb-10 uppercase tracking-[0.4em] font-bold">v1.1 • Season + Career</p>
                 <div class="grid grid-cols-1 gap-4">
                     <button onclick="startSetup('BATTER')" class="btn bg-amber-600 p-5 rounded-2xl font-black text-lg shadow-xl">BE THE SLUGGER</button>
                     <button onclick="startSetup('PITCHER')" class="btn bg-indigo-600 p-5 rounded-2xl font-black text-lg shadow-xl">BE THE ACE</button>
@@ -214,15 +241,18 @@
                             </select>
                         </div>
                         <div>
-                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Season Mode</label>
-                            <div class="select-dark text-center">4 GAME SEASON</div>
+                            <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Mode</label>
+                            <select id="mode-select" class="select-dark">
+                                <option value="SEASON">Season Mode - 4 Games</option>
+                                <option value="CAREER">Career Mode - Up to 20 Seasons</option>
+                            </select>
                         </div>
                     </div>
                     <div class="space-y-4">
-                        <div><label id="slider-1-label" class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Attribute A</label><input type="range" id="attr-1" min="60" max="99" value="80" class="w-full accent-amber-500"></div>
-                        <div><label id="slider-2-label" class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Attribute B</label><input type="range" id="attr-2" min="60" max="99" value="75" class="w-full accent-amber-500"></div>
-                        <div><label id="slider-3-label" class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Attribute C</label><input type="range" id="attr-3" min="60" max="99" value="70" class="w-full accent-amber-500"></div>
-                        <div><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Stamina (PITCHER ONLY)</label><input type="range" id="attr-sta" min="60" max="99" value="85" class="w-full accent-emerald-500"></div>
+                        <div><label id="slider-1-label" class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Attribute A</label><input type="range" id="attr-1" min="55" max="80" value="70" class="w-full accent-amber-500"></div>
+                        <div><label id="slider-2-label" class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Attribute B</label><input type="range" id="attr-2" min="55" max="80" value="68" class="w-full accent-amber-500"></div>
+                        <div><label id="slider-3-label" class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Attribute C</label><input type="range" id="attr-3" min="55" max="80" value="66" class="w-full accent-amber-500"></div>
+                        <div><label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Stamina (PITCHER ONLY)</label><input type="range" id="attr-sta" min="55" max="80" value="70" class="w-full accent-emerald-500"></div>
                     </div>
                     <div id="arsenal-selection">
                         <label class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-2">Build Your Arsenal (Select 1-6)</label>
@@ -277,8 +307,9 @@ const NAME_POOL = ['MARTINEZ','WALKER','KIM','DAVIS','SANTOS','MURPHY','CRUZ','B
 function blankPitchStats(){ return { ip_outs:0,k:0,bb:0,er:0,r:0,h:0,pitches:0,sta:100,errors:0,bf:0 }; }
 function blankBatStats(){ return { ab:0,h:0,singles:0,doubles:0,triples:0,hr:0,bb:0,k:0,rbi:0,runs:0,tb:0,sf:0,energy:100 }; }
 let state = {
- screen:'START', userRole:'PITCHER', userName:'PLAYER', userTeam:'CHI', oppTeam:'NY', statsView:'GAME', showExtraStats:false,
+ screen:'START', userRole:'PITCHER', userName:'PLAYER', userTeam:'CHI', oppTeam:'NY', statsView:'GAME', showExtraStats:false, gameMode:'SEASON',
  season:{ gameNo:1, maxGames:4, wins:0, losses:0, schedule:['NY','LA','TOK','SEA'] },
+ career:{ enabled:false, seasonNo:1, maxSeasons:20, upgradePoints:0, awards:[], phase:'RISING' },
  attributes:{ p1:80,p2:75,p3:70,stamina:85 }, userArsenal:[], currentBatter:null,
  score:[0,0], inning:1, top:true, outs:0, balls:0, strikes:0,
  bases:[false,false,false], unearnedRunners:[false,false,false], lineupIndex:0, userLineupSpot:2,
@@ -286,7 +317,7 @@ let state = {
  ball:{active:false,x:475,y:PITCH_START_Y,vx:0,vy:0,type:'4FB',speed:0,processed:false,swingChecked:false},
  swing:{active:false,timer:0}, messages:[], selectedPitch:'4FB', isWaiting:false, isPulled:false,
  lastPitch:{type:'-',speed:'-'}, atBatStarted:false,
- stats:blankPitchStats(), seasonStats:blankPitchStats(), batStats:blankBatStats(), seasonBatStats:blankBatStats()
+ stats:blankPitchStats(), seasonStats:blankPitchStats(), batStats:blankBatStats(), seasonBatStats:blankBatStats(), careerPitchStats:blankPitchStats(), careerBatStats:blankBatStats()
 };
 const optContainer = document.getElementById('pitch-options');
 Object.keys(PITCH_DB).forEach(key=>{ const div=document.createElement('div'); div.innerHTML=`<input type="checkbox" id="opt-${key}" class="hidden pitch-opt-cb" value="${key}"><label for="opt-${key}" class="block border-2 border-slate-700 p-2 rounded-lg text-[9px] font-black text-center cursor-pointer uppercase transition-all hover:border-amber-500">${PITCH_DB[key].name}</label>`; optContainer.appendChild(div); });
@@ -297,10 +328,11 @@ function startSetup(role){
  document.getElementById('arsenal-selection').classList.toggle('hidden', role!=='PITCHER');
  const labels=role==='PITCHER'?['Velocity','Control','Movement']:['Contact','Power','Vision'];
  document.getElementById('slider-1-label').innerText=labels[0]; document.getElementById('slider-2-label').innerText=labels[1]; document.getElementById('slider-3-label').innerText=labels[2];
- document.getElementById('setup-header').innerText=role==='PITCHER'?'Pitcher Academy - Season Mode':'Batting Cage - Season Mode';
+ document.getElementById('setup-header').innerText=role==='PITCHER'?'Pitcher Academy - v1.1':'Batting Cage - v1.1';
 }
 function confirmSetup(){
  state.userName=(document.getElementById('player-name').value || (state.userRole==='PITCHER'?'ACE':'SLUGGER')).toUpperCase();
+ state.gameMode=document.getElementById('mode-select').value; state.career.enabled=state.gameMode==='CAREER'; state.career.seasonNo=1; state.career.upgradePoints=0; state.career.awards=[]; state.seasonStats=blankPitchStats(); state.seasonBatStats=blankBatStats(); state.careerPitchStats=blankPitchStats(); state.careerBatStats=blankBatStats();
  state.userTeam=document.getElementById('team-select').value; state.season.schedule=Object.keys(TEAMS).filter(t=>t!==state.userTeam).slice(0,4);
  state.attributes.p1=+document.getElementById('attr-1').value; state.attributes.p2=+document.getElementById('attr-2').value; state.attributes.p3=+document.getElementById('attr-3').value; state.attributes.stamina=+document.getElementById('attr-sta').value;
  if(state.userRole==='PITCHER'){ const selected=Array.from(document.querySelectorAll('.pitch-opt-cb:checked')).map(cb=>cb.value); if(selected.length<1||selected.length>6){alert('Select 1-6 pitches!');return;} state.userArsenal=selected; state.selectedPitch=selected[0]; }
@@ -332,14 +364,14 @@ function makeBatter(name, idx, isUser=false){
 function makeLineup(includeUser){ const used=new Set(); const arr=[]; for(let i=0;i<9;i++){ let n; do{ n=NAME_POOL[Math.floor(Math.random()*NAME_POOL.length)]; }while(used.has(n)); used.add(n); arr.push(makeBatter(n,i,false)); } if(includeUser){ arr[state.userLineupSpot]=makeBatter(state.userName,state.userLineupSpot,true); } return arr; }
 function startGame(gameNo){
  state.screen='GAME'; state.season.gameNo=gameNo; state.oppTeam=state.season.schedule[gameNo-1] || 'NY'; state.score=[0,0]; state.inning=1; state.top=true; state.outs=0; state.balls=0; state.strikes=0; state.bases=[false,false,false]; state.unearnedRunners=[false,false,false]; state.lineupIndex=0; state.isPulled=false; state.isWaiting=false; state.messages=[]; state.currentGameLog=[]; state.stats=blankPitchStats(); state.batStats=blankBatStats(); state.lastPitch={type:'-',speed:'-'}; state.statsView='GAME';
- state.opponentLineup=makeLineup(false); state.teammateLineup=makeLineup(state.userRole==='BATTER'); updateUI(); nextPlay();
+ state.opponentLineup=makeLineup(false); state.teammateLineup=makeLineup(state.userRole==='BATTER'); const opt=document.getElementById('opt-out-btn'); if(opt)opt.classList.remove('hidden'); updateUI(); nextPlay();
 }
 function nextPlay(){
  if(state.inning>9 && state.score[0]!==state.score[1]){ gameOver(); return; }
  state.balls=0; state.strikes=0; state.ball.active=false; state.ball.processed=false; state.ball.swingChecked=false; state.isWaiting=false;
  if(state.isPulled){ startSimInning(); return; }
  if(state.userRole==='PITCHER'){
-   if(state.top){ setCurrentBatter(state.opponentLineup[state.lineupIndex%9]); showUI('PITCH'); updateUI(); } else startSimInning();
+   if(state.top){ const pullReason=getPullReason(); if(pullReason){ managerPull(pullReason); return; } setCurrentBatter(state.opponentLineup[state.lineupIndex%9]); showUI('PITCH'); updateUI(); } else startSimInning();
  } else {
    if(state.top){ simulateToUserAtBat(); } else startSimInning();
  }
@@ -360,7 +392,7 @@ function canvasPitch(e){
  state.ball.x=475; state.ball.y=PITCH_START_Y; state.ball.type=state.selectedPitch; state.ball.processed=false; state.ball.swingChecked=false; state.ball.vy=state.ball.speed/11;
  const err=((100-state.attributes.p2)/3.3)+(1-fatigue)*11; state.ball.vx=((targetX-475)/50)+((Math.random()-.5)*err/7);
  state.ball.active=true; state.stats.pitches++; state.seasonStats.pitches++; const drain=p.stam*(1.24-(state.attributes.stamina/190))*(state.stats.pitches>85?1.10:1); state.stats.sta=Math.max(0,state.stats.sta-drain);
- state.lastPitch={type:p.name,speed:state.ball.speed}; startAtBatIfNeeded(); updateUI(); checkPullManager();
+ state.lastPitch={type:p.name,speed:state.ball.speed}; startAtBatIfNeeded(); updateUI();
 }
 canvas.addEventListener('pointerdown', canvasPitch);
 canvas.addEventListener('touchstart', (e)=>{ if(window.PointerEvent) return; e.preventDefault(); canvasPitch(e); }, {passive:false});
@@ -399,15 +431,40 @@ function nextAtBat(){ state.balls=0; state.strikes=0; state.ball.active=false; s
 function readyForNextPitch(){ state.ball.active=false; state.ball.processed=false; state.ball.swingChecked=false; state.isWaiting=false; updateUI(); if(state.userRole==='BATTER'&&state.top) aiPitch(); }
 function startSimInning(){ showUI('NONE'); const simBox=document.getElementById('sim-ui'), log=document.getElementById('sim-log'); simBox.classList.remove('hidden'); document.getElementById('resume-btn').classList.add('hidden'); log.innerHTML=`<div class="animate-pulse text-slate-400">${state.isPulled?'The bullpen is finishing the game...':'Other half-inning is being simulated...'}</div>`; setTimeout(()=>{ const runs=Math.random()<(state.isPulled?.38:.28)?Math.floor(Math.random()*4):0; state.score[offenseIndex()]+=runs; updateUI(); log.innerHTML=`<span class="text-3xl font-black italic">${runs} RUNS SCORED</span><br><span class="text-[10px] uppercase text-slate-500">Season Game ${state.season.gameNo}/4</span>`; document.getElementById('resume-btn').classList.remove('hidden'); },900); }
 function advanceHalfInning(){ if(!state.top) state.inning++; state.top=!state.top; state.outs=0; state.bases=[false,false,false]; state.unearnedRunners=[false,false,false]; document.getElementById('sim-title').innerText='Inning Transition'; nextPlay(); }
-function checkPullManager(){ if(state.userRole!=='PITCHER'||state.isPulled) return; let pull=false,reason=''; if(state.stats.sta<=18){pull=true;reason='FATIGUE LIMIT REACHED';} else if(state.stats.er>=5){pull=true;reason='5 EARNED RUNS ALLOWED';} else if(state.stats.r>=7){pull=true;reason='7 RUNS ALLOWED';} else if(state.stats.pitches>=110){pull=true;reason='PITCH COUNT LIMIT';} if(pull){ state.isPulled=true; addMsg("MANAGER: YOU'RE DONE!"); setTimeout(()=>{ document.getElementById('sim-title').innerText='PLAYER PULLED'; document.getElementById('sim-log').innerHTML=`<div class="text-red-500 font-black">${reason}</div><div class="text-sm text-slate-400 mt-2">Simulating the rest of the game...</div>`; document.getElementById('sim-ui').classList.remove('hidden'); document.getElementById('pitching-ui').classList.add('hidden'); document.getElementById('resume-btn').classList.remove('hidden'); },1200); } }
-function gameOver(){ state.screen='END'; showUI('NONE'); const playerScore=state.score[0], oppScore=state.score[1], win=playerScore>oppScore; if(win)state.season.wins++; else state.season.losses++; const done=state.season.gameNo>=state.season.maxGames; const btn=done?`<button onclick="location.reload()" class="btn mt-6 bg-amber-600 px-6 py-2 rounded-xl text-xs font-black uppercase">New Season</button>`:`<button onclick="startGame(${state.season.gameNo+1})" class="btn mt-6 bg-emerald-600 px-6 py-2 rounded-xl text-xs font-black uppercase">Next Game</button>`; document.getElementById('sim-ui').classList.remove('hidden'); document.getElementById('sim-title').innerText=done?'SEASON COMPLETE':'BALL GAME OVER'; document.getElementById('sim-log').innerHTML=`<div class="text-4xl font-black italic ${win?'text-emerald-400':'text-red-500'}">${win?'VICTORY':'DEFEAT'}</div><div class="mt-3 text-slate-400 text-sm">Final: ${state.userTeam} ${playerScore} - ${oppScore} ${state.oppTeam}</div><div class="mt-2 text-amber-400 text-xs font-black uppercase">Season Record: ${state.season.wins}-${state.season.losses}</div>${btn}`; document.getElementById('resume-btn').classList.add('hidden'); }
+function getPullReason(){
+ if(state.userRole!=='PITCHER'||state.isPulled) return '';
+ if(state.stats.sta<=18) return 'FATIGUE LIMIT REACHED';
+ if(state.stats.er>=5) return '5 EARNED RUNS ALLOWED';
+ if(state.stats.r>=7) return '7 RUNS ALLOWED';
+ if(state.stats.pitches>=110) return 'PITCH COUNT LIMIT';
+ return '';
+}
+function managerPull(reason){
+ if(state.isPulled) return; state.isPulled=true; showUI('NONE'); addMsg("MANAGER: YOU'RE DONE!"); const opt=document.getElementById('opt-out-btn'); if(opt)opt.classList.add('hidden');
+ setTimeout(()=>{ document.getElementById('sim-title').innerText='PLAYER PULLED'; document.getElementById('sim-log').innerHTML=`<div class="text-red-500 font-black">${reason}</div><div class="text-sm text-slate-400 mt-2">Called before the next batter / inning. Simulating the rest of the game...</div>`; document.getElementById('sim-ui').classList.remove('hidden'); document.getElementById('pitching-ui').classList.add('hidden'); document.getElementById('resume-btn').classList.remove('hidden'); },700);
+}
+function checkPullManager(){ const reason=getPullReason(); if(reason) managerPull(reason); }
+function addToCareerTotals(){ const add=(a,b)=>{ Object.keys(b).forEach(k=>{ if(typeof b[k]==='number') a[k]=(a[k]||0)+b[k]; }); }; add(state.careerPitchStats,state.seasonStats); add(state.careerBatStats,state.seasonBatStats); }
+function getCareerPhase(){ const s=state.career.seasonNo; if(s<=5) return 'RISING'; if(s<=12) return 'PEAK'; return 'REGRESSION'; }
+function careerPointMultiplier(){ const p=getCareerPhase(); return p==='RISING'?1.0:p==='PEAK'?0.65:0.38; }
+function calculateUpgradePoints(){ if(!state.career.enabled) return 0; let raw=0; if(state.userRole==='PITCHER'){ const ip=state.seasonStats.ip_outs/3, era=ip?state.seasonStats.er*9/ip:9, whip=ip?(state.seasonStats.bb+state.seasonStats.h)/ip:3; raw+=Math.floor(state.seasonStats.k/3)+Math.floor(ip/4)+(era<3.5?4:era<5?2:0)+(whip<1.25?3:0)+state.season.wins*2; } else { const b=state.seasonBatStats, avg=b.ab?b.h/b.ab:0, ops=(b.ab?b.tb/b.ab:0)+((b.ab+b.bb+b.sf)?(b.h+b.bb)/(b.ab+b.bb+b.sf):0); raw+=Math.floor(b.h/3)+b.hr*2+Math.floor(b.rbi/4)+(avg>.300?4:avg>.250?2:0)+(ops>.850?4:0)+state.season.wins*2; } return Math.max(2,Math.floor(raw*careerPointMultiplier())); }
+function careerAwards(){ const awards=[]; if(state.userRole==='PITCHER'){ const ip=state.seasonStats.ip_outs/3, era=ip?state.seasonStats.er*9/ip:99; if(ip>=12&&era<3.25&&state.seasonStats.k>=18)awards.push('BEST PITCHER'); if(ip>=16&&era<2.50)awards.push('CY DIAMOND'); if(state.season.wins>=3&&era<4.00)awards.push('MVP FINALIST'); } else { const b=state.seasonBatStats, avg=b.ab?b.h/b.ab:0, ops=(b.ab?b.tb/b.ab:0)+((b.ab+b.bb+b.sf)?(b.h+b.bb)/(b.ab+b.bb+b.sf):0); if(avg>.320||ops>.900)awards.push('SILVER BAT'); if(b.hr>=3||b.rbi>=10)awards.push('POWER AWARD'); if(state.season.wins>=3&&ops>.820)awards.push('MVP FINALIST'); } if(state.career.seasonNo===1&&awards.length)awards.push('ROOKIE STAR'); return awards.length?awards:['NO AWARDS']; }
+function applyCareerRegression(){ if(!state.career.enabled) return; const phase=getCareerPhase(); state.career.phase=phase; if(phase==='REGRESSION'){ const loss=state.career.seasonNo>=17?2:1; state.attributes.p1=clamp(state.attributes.p1-loss,40,99); state.attributes.p2=clamp(state.attributes.p2-loss,40,99); state.attributes.p3=clamp(state.attributes.p3-loss,40,99); state.attributes.stamina=clamp(state.attributes.stamina-loss,40,99); } }
+function gameOver(){ state.screen='END'; showUI('NONE'); const playerScore=state.score[0], oppScore=state.score[1], win=playerScore>oppScore; if(win)state.season.wins++; else state.season.losses++; const done=state.season.gameNo>=state.season.maxGames; const opt=document.getElementById('opt-out-btn'); if(opt)opt.classList.add('hidden'); if(done&&state.career.enabled){ careerSeasonComplete(); return; } const btn=done?`<button onclick="location.reload()" class="btn mt-6 bg-amber-600 px-6 py-2 rounded-xl text-xs font-black uppercase">New Season</button>`:`<button onclick="startGame(${state.season.gameNo+1})" class="btn mt-6 bg-emerald-600 px-6 py-2 rounded-xl text-xs font-black uppercase">Next Game</button>`; document.getElementById('sim-ui').classList.remove('hidden'); document.getElementById('sim-title').innerText=done?'SEASON COMPLETE':'BALL GAME OVER'; document.getElementById('sim-log').innerHTML=`<div class="text-4xl font-black italic ${win?'text-emerald-400':'text-red-500'}">${win?'VICTORY':'DEFEAT'}</div><div class="mt-3 text-slate-400 text-sm">Final: ${state.userTeam} ${playerScore} - ${oppScore} ${state.oppTeam}</div><div class="mt-2 text-amber-400 text-xs font-black uppercase">Season Record: ${state.season.wins}-${state.season.losses}</div>${btn}`; document.getElementById('resume-btn').classList.add('hidden'); }
+function careerSeasonComplete(){ addToCareerTotals(); const awards=careerAwards(); state.career.awards.push({season:state.career.seasonNo,awards}); const pts=calculateUpgradePoints(); state.career.upgradePoints+=pts; applyCareerRegression(); const finalSeason=state.career.seasonNo>=state.career.maxSeasons; document.getElementById('sim-ui').classList.remove('hidden'); document.getElementById('sim-title').innerText=finalSeason?'CAREER COMPLETE':'CAREER OFFSEASON'; const nextBtn=finalSeason?`<button onclick="location.reload()" class="btn mt-4 bg-amber-600 px-6 py-3 rounded-xl text-xs font-black uppercase">Retire / New Career</button>`:`<button onclick="startNextCareerSeason()" class="btn mt-4 bg-emerald-600 px-6 py-3 rounded-xl text-xs font-black uppercase">Start Season ${state.career.seasonNo+1}</button>`; document.getElementById('sim-log').innerHTML=`<div class="career-panel"><div class="text-2xl font-black italic text-amber-400">Season ${state.career.seasonNo} Complete</div><div class="text-xs text-slate-400 mt-1">Record: ${state.season.wins}-${state.season.losses} • Phase: ${getCareerPhase()} • OVR ${Math.round((state.attributes.p1+state.attributes.p2+state.attributes.p3+state.attributes.stamina)/4)} • +${pts} Upgrade Points</div><div class="text-sm mt-3 text-white">Awards: <span class="text-amber-300">${awards.join(', ')}</span></div><div class="mt-4 text-[10px] font-black text-slate-500 uppercase">Upgrade Points: <span id="upgrade-points" class="text-emerald-400">${state.career.upgradePoints}</span></div>${upgradeRows()}${nextBtn}</div>`; document.getElementById('resume-btn').classList.add('hidden'); }
+function upgradeRows(){ const names=state.userRole==='PITCHER'?['Velocity','Control','Movement','Stamina']:['Contact','Power','Vision','Durability']; return `<div class="mt-3">${names.map((n,i)=>`<div class="upgrade-row"><span class="text-xs font-black text-slate-300">${n}: <b id="up-val-${i}" class="text-white">${getAttrByIndex(i)}</b></span><button onclick="buyUpgrade(${i})" class="btn tiny-btn bg-blue-700 border border-blue-900 text-white">+1</button></div>`).join('')}</div>`; }
+function getAttrByIndex(i){ return i===0?state.attributes.p1:i===1?state.attributes.p2:i===2?state.attributes.p3:state.attributes.stamina; }
+function setAttrByIndex(i,v){ if(i===0)state.attributes.p1=v; else if(i===1)state.attributes.p2=v; else if(i===2)state.attributes.p3=v; else state.attributes.stamina=v; }
+function buyUpgrade(i){ if(state.career.upgradePoints<=0)return; const cur=getAttrByIndex(i); if(cur>=99)return; setAttrByIndex(i,cur+1); state.career.upgradePoints--; const p=document.getElementById('upgrade-points'); if(p)p.innerText=state.career.upgradePoints; const v=document.getElementById('up-val-'+i); if(v)v.innerText=getAttrByIndex(i); }
+function startNextCareerSeason(){ state.career.seasonNo++; state.season.gameNo=1; state.season.wins=0; state.season.losses=0; state.seasonStats=blankPitchStats(); state.seasonBatStats=blankBatStats(); state.season.schedule=Object.keys(TEAMS).filter(t=>t!==state.userTeam).sort(()=>Math.random()-.5).slice(0,4); startGame(1); }
+function optOutGame(){ if(state.screen!=='GAME'&&state.screen!=='END')return; showUI('NONE'); state.isPulled=true; addMsg('PLAYER OPTED OUT'); const opt=document.getElementById('opt-out-btn'); if(opt)opt.classList.add('hidden'); document.getElementById('sim-ui').classList.remove('hidden'); document.getElementById('sim-title').innerText='PLAYER OPTED OUT'; document.getElementById('sim-log').innerHTML='<div class="text-slate-300">Simulating the rest of this game...</div>'; document.getElementById('resume-btn').classList.add('hidden'); setTimeout(()=>{ while(state.inning<=9){ state.score[0]+=Math.random()<.28?Math.floor(Math.random()*3):0; state.score[1]+=Math.random()<.28?Math.floor(Math.random()*3):0; state.inning++; } gameOver(); },900); }
 function toggleStatsView(){ state.statsView=state.statsView==='GAME'?'SEASON':'GAME'; updateUI(); }
 function toggleExtraStats(){ state.showExtraStats=!state.showExtraStats; document.querySelectorAll('.extra-stat').forEach(el=>el.classList.toggle('hidden-extra', !state.showExtraStats)); const b=document.getElementById('extra-toggle'); if(b)b.innerText=state.showExtraStats?'HIDE':'DETAILS'; }
 function addMsg(txt){ state.messages.push({txt,y:350,opacity:1}); const f=document.getElementById('pitch-feedback'); if(f)f.innerText=txt; }
 function fmtRate(v){ return v.toFixed(3).replace(/^0/,''); }
 function statSet(id,val){ const el=document.getElementById(id); if(el)el.innerText=val; }
 function updateUI(){
- statSet('hud-score',`${state.userTeam} ${state.score[0]} - ${state.score[1]} ${state.oppTeam}`); statSet('hud-inning',`${state.top?'TOP':'BOT'} ${state.inning}`); statSet('hud-outs',`${state.outs} OUTS`); statSet('season-line',`${TEAMS[state.userTeam]} | Game ${state.season.gameNo}/4 | ${state.season.wins}-${state.season.losses}`); const t=document.getElementById('stats-toggle'); if(t)t.innerText=state.statsView;
+ statSet('hud-score',`${state.userTeam} ${state.score[0]} - ${state.score[1]} ${state.oppTeam}`); statSet('hud-inning',`${state.top?'TOP':'BOT'} ${state.inning}`); statSet('hud-outs',`${state.outs} OUTS`); statSet('season-line',`${TEAMS[state.userTeam]} | ${state.career.enabled?'Career S'+state.career.seasonNo:'Season'} G${state.season.gameNo}/4 | ${state.season.wins}-${state.season.losses}`); const t=document.getElementById('stats-toggle'); if(t)t.innerText=state.statsView;
  const ps=state.statsView==='GAME'?state.stats:state.seasonStats; const fullIP=Math.floor(ps.ip_outs/3), rem=ps.ip_outs%3, ipVal=ps.ip_outs/3; statSet('stat-ip',`${fullIP}.${rem}`); statSet('stat-k',ps.k); statSet('stat-bb',ps.bb); statSet('stat-hits-allowed',ps.h); statSet('stat-pitch-count',ps.pitches); statSet('stat-r',ps.r); statSet('stat-er',ps.er); statSet('stat-e',ps.errors); statSet('stat-bf',ps.bf); statSet('stat-era',ipVal===0?'0.00':(ps.er*9/ipVal).toFixed(2)); statSet('stat-whip',ipVal===0?'0.00':((ps.bb+ps.h)/ipVal).toFixed(2)); statSet('stat-last-type',state.lastPitch.type); statSet('stat-last-speed',state.lastPitch.speed+(state.lastPitch.speed==='-'?'':' MPH'));
  const staVal=Math.max(0,Math.floor(state.stats.sta)); const staEl=document.getElementById('stat-sta'); if(staEl){staEl.innerText=staVal+'%'; staEl.className=`stat-val ${staVal<30?'text-red-500':staVal<60?'text-amber-500':'text-emerald-400'}`;}
  const b=state.currentBatter||{}; statSet('batter-name-mini',b.name||'OPPONENT'); statSet('opp-name',b.name||'OPPONENT'); statSet('opp-type',b.type||'BALANCED'); statSet('opp-game',b.game?`${b.game.h}-${b.game.ab}`:'0-0'); statSet('opp-season',b.season&&b.season.ab?fmtRate(b.season.h/b.season.ab):'.000'); statSet('opp-last',b.last||'-'); statSet('attr-b-con',Math.floor(b.con||0)); statSet('attr-b-pow',Math.floor(b.pow||0)); statSet('attr-b-vis',Math.floor(b.vis||0)); statSet('attr-b-dis',Math.floor(b.dis||0)); statSet('attr-b-spd',Math.floor(b.spd||0));

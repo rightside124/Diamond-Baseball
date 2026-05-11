@@ -4,6 +4,12 @@ body {
   color:white;
 }
 
+/* Hide until game starts */
+#scoreboard,
+#controls {
+  display: none;
+}
+
 #scoreboard {
   position:absolute;
   width:100%;
@@ -11,7 +17,8 @@ body {
   background:black;
   display:flex;
   justify-content:space-between;
-  padding:6px;
+  padding:8px;
+  font-weight:bold;
 }
 
 canvas {
@@ -28,6 +35,13 @@ canvas {
 
 button {
   padding:12px;
-  margin:4px;
+  margin:5px;
 }
-``
+
+#menu {
+  position:absolute;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  text-align:center;
+}

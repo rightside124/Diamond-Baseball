@@ -2,7 +2,7 @@ function createPitch(type){
 
   let base = {
     x:475,
-    y:200,
+    y:120,
     vx:0,
     vy:6,
     breakX:0,
@@ -14,11 +14,11 @@ function createPitch(type){
   }
 
   if(type === "CURVE"){
-    base.breakY = 3;
+    base.breakY = 2.5;
   }
 
   if(type === "SLIDER"){
-    base.breakX = -3;
+    base.breakX = -2.5;
   }
 
   if(type === "CHANGEUP"){
@@ -27,4 +27,3 @@ function createPitch(type){
 
   return base;
 }
-[

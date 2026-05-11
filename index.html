@@ -1,19 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-title>Diamond Baseball v1.6</title>
-styles.css>
+
+<title>Diamond Baseball v1.6</title>
+
+<link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
 
+<div id="app">
+
 <!-- SCOREBOARD -->
 <div id="scoreboard">
-  <div id="teams"></div>
-  <div id="count"></div>
-  <div id="bases"></div>
-  <div id="pitch-info"></div>
+  <div id="teams">CHI 0 | 0 NY</div>
+  <div id="count">0-0 • 0 OUTS</div>
+  <div id="bases">◇ ◆ ◇</div>
+  <div id="pitch-info">---</div>
 </div>
 
 <canvas id="gameCanvas"></canvas>
@@ -30,13 +35,16 @@ styles.css>
   <button onclick="loadGame()">Load</button>
 </div>
 
-script src="data.js">
-script src="engine.js">
-script src="career.js">
-script src="league.js">
-script src="save.js">
-script src="ui.js">
-script src="game.js">
+</div>
+
+<!-- ✅ FIXED SCRIPT TAGS -->
+<script src="js/data.js"></script>
+<script src="js/engine.js"></script>
+<script src="js/career.js"></script>
+<script src="js/league.js"></script>
+<script src="js/save.js"></script>
+<script src="js/ui.js"></script>
+<script src="js/game.js"></script>
 
 </body>
 </html>
